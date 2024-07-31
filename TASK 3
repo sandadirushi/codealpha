@@ -1,0 +1,148 @@
+import java.util.*;
+
+class Room {
+    int roomNumber;
+    String type;
+    boolean isAvailable;
+
+    Room(int roomNumber, String type) {
+        this.roomNumber = roomNumber;
+        this.type = type;
+        this.isAvailable = true;
+    }
+}
+
+class Booking {
+    int bookingId;
+    int roomNumber;
+    String customerName;
+    String paymentStatus;
+
+    Booking(int bookingId, int roomNumber, String customerName) {
+        this.bookingId = bookingId;
+        this.roomNumber = roomNumber;
+        this.customerName = customerName;
+        this.paymentStatus = "Pending";
+    }
+}
+
+public class HotelReservationSystem {
+    static List<Room> rooms = new ArrayList<>();
+    static List<Booking> bookings = new ArrayList<>();
+    static int bookingIdCounter = 1;
+
+    public static void main(String[] args) {
+        initializeRooms();
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("\nHotel Reservation System");
+            System.out.println("1. Search for Available Rooms");
+            System.out.println("2. Make a Reservation");
+            System.out.println("3. View Booking Details");
+            System.out.println("4. Exit");
+            System.out.print("Choose an option: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();  
+            switch (choice) {
+                case 1:
+                    searchRooms(scanner);
+                    break;
+                case 2:
+                    makeReservation(scanner);
+                    break;
+                case 3:
+                    viewBookingDetails(scanner);
+                    break;
+                case 4:
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    static void initializeRooms() {
+        rooms.add(new Room(101, "Single"));
+        rooms.add(new Room(102, "Single"));
+        rooms.add(new Room(201, "Double"));
+        rooms.add(new Room(202, "Double"));
+        rooms.add(new Room(301, "Suite"));
+        rooms.add(new Room(302, "Suite"));
+    }
+
+    static void searchRooms(Scanner scanner) {
+        System.out.print("Enter room type (Single/Double/Suite): ");
+        String type = scanner.nextLine();
+        System.out.println("Available Rooms:");
+        for (Room room : rooms) {
+            if (room.type.equalsIgnoreCase(type) && room.isAvailable) {
+                System.out.println("Room Number: " + room.roomNumber);
+            }
+        }
+    }
+
+    static void makeReservation(Scanner scanner) {
+        System.out.print("Enter room number to book: ");
+        int roomNumber = scanner.nextInt();
+        scanner.nextLine();  
+        Room roomToBook = null;
+        for (Room room : rooms) {
+            if (room.roomNumber == roomNumber && room.isAvailable) {
+                roomToBook = room;
+                break;
+            }
+        }
+        if (roomToBook == null) {
+            System.out.println("Room not available or invalid room number.");
+            return;
+        }
+
+        System.out.print("Enter customer name: ");
+        String customerName = scanner.nextLine();
+
+        Booking booking = new Booking(bookingIdCounter++, roomNumber, customerName);
+        bookings.add(booking);
+        roomToBook.isAvailable = false;
+
+        System.out.println("Booking successful! Booking ID: " + booking.bookingId);
+        System.out.print("Enter payment amount: ");
+        double paymentAmount = scanner.nextDouble();
+        scanner.nextLine();  
+
+        
+        if (processPayment(paymentAmount)) {
+            booking.paymentStatus = "Completed";
+            System.out.println("Payment successful!");
+        } else {
+            System.out.println("Payment failed!");
+        }
+    }
+
+    static void viewBookingDetails(Scanner scanner) {
+        System.out.print("Enter booking ID: ");
+        int bookingId = scanner.nextInt();
+        scanner.nextLine();  
+        Booking booking = null;
+        for (Booking b : bookings) {
+            if (b.bookingId == bookingId) {
+                booking = b;
+                break;
+            }
+        }
+        if (booking == null) {
+            System.out.println("Invalid booking ID.");
+            return;
+        }
+        System.out.println("Booking Details:");
+        System.out.println("Booking ID: " + booking.bookingId);
+        System.out.println("Room Number: " + booking.roomNumber);
+        System.out.println("Customer Name: " + booking.customerName);
+        System.out.println("Payment Status: " + booking.paymentStatus);
+    }
+
+    static boolean processPayment(double amount) {
+        
+        return amount > 0;
+    }
+}
